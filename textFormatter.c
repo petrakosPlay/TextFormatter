@@ -22,6 +22,7 @@ static int CHARS_PER_LINE;
 char wordBuffer[MAX_WORD_LENGTH];
 wordDetails wordsBuffer[MAX_WORDS_PER_PARAGRAPH];
 int i, j;
+int charsPerLine;
 
 
 /*------------------------------------------------------------------------------------------------------------*/
@@ -152,14 +153,15 @@ int readParagraph(FILE *inputFilePtr)
 int main(int argc, char **argv)
 {
 	
-	if (argc == 1)
+	if (argc > 1)	charsPerLine = atoi(argv[1]);
+	else
 	{
 		fprintf(stderr, "Please provide the desired number of characters per line\n");
-		fprintf(stderr, "Example ./tf 100\n");
+		fprintf(stderr, "Example ./tf 100 for 100 characters per line\n");
 		return EXIT_FAILURE;
 	}
-	else	CHARS_PER_LINE = atoi(argv[1]);
-
+	
+	
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
     //if ((inputFilePtr = fopen("C:\\Users\\d-pkaltzias\\Desktop\\randomText.txt", "r") ) == NULL )
@@ -192,7 +194,7 @@ int main(int argc, char **argv)
 	//Calculate the cost/badness for each possible string of words that can fit in one line.
 		if (j==0) exit(EXIT_SUCCESS);
 		
-		int wordsCount = j, charsPerLine = CHARS_PER_LINE;
+		int wordsCount = j;
 		int curLineLength = 0, curLineStart, nextLineStart, currentCost, suffixBadness=0;
 		int **costBuffer, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
