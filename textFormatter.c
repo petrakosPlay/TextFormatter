@@ -63,7 +63,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 #endif	
 
 //Break text into single words and store them in a buffer.
-	int nextChar, charCount, consecutiveNewLineCharacters, remainingBytes;
+	int nextChar, charCount, consecutiveNewLineCharacters, bytesRemain;
 	charCount = consecutiveNewLineCharacters = i = j = 0;
     while( isspace(nextChar = fgetc(inputFilePtr)) )	continue;			//Skip all whitespace at the beginning of the text
     	
@@ -112,45 +112,45 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 				if (handleAtSignIsEnabled)
 				{
 					wordBuffer[i++] = nextChar;
-					remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-					while (remainingBytes)
+					bytesRemain = numberOfBytesInChar((unsigned char)nextChar) - 1;
+					while (bytesRemain)
 					{
 						nextChar = fgetc(inputFilePtr);
 						wordBuffer[i++] = nextChar;
-						remainingBytes--;
+						bytesRemain--;
 					}
 					charCount++;
 					while ( (nextChar = fgetc(inputFilePtr) ) != '@')
 					{
 						wordBuffer[i++] = nextChar;
-						remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-						while (remainingBytes)
+						bytesRemain = numberOfBytesInChar((unsigned char)nextChar) - 1;
+						while (bytesRemain)
 						{
 							nextChar = fgetc(inputFilePtr);
 							wordBuffer[i++] = nextChar;
-							remainingBytes--;
+							bytesRemain--;
 						}
 						charCount++;
 					}
 					wordBuffer[i++] = nextChar;
-					remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-					while (remainingBytes)
+					bytesRemain = numberOfBytesInChar((unsigned char)nextChar) - 1;
+					while (bytesRemain)
 					{
 						nextChar = fgetc(inputFilePtr);
 						wordBuffer[i++] = nextChar;
-						remainingBytes--;
+						bytesRemain--;
 					}
 					charCount++;
 					break;
 				}
 			default:
 				wordBuffer[i++] = nextChar;
-				remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-				while (remainingBytes)
+				bytesRemain = numberOfBytesInChar((unsigned char)nextChar) - 1;
+				while (bytesRemain)
 				{
 					nextChar = fgetc(inputFilePtr);
 					wordBuffer[i++] = nextChar;
-					remainingBytes--;
+					bytesRemain--;
 				}
 				charCount++;
 				consecutiveNewLineCharacters = 0;
