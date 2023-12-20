@@ -20,6 +20,8 @@ typedef struct wordDetails
 static int INFINITY = -1;
 char wordBuffer[MAX_WORD_LENGTH];
 wordDetails wordsBuffer[MAX_WORDS_PER_PARAGRAPH];
+
+
 int i, j;
 int charsPerLine;
 
@@ -29,6 +31,11 @@ int charsPerLine;
 /* Helper functions */
 
 void perrorExit(char *errorMsg) {
+	fprintf(stderr, "%s\n", errorMsg);
+	exit(EXIT_FAILURE);
+}
+
+void perrorExit2(char *errorMsg) {
 	fprintf(stderr, "%s\n", errorMsg);
 	exit(EXIT_FAILURE);
 }
@@ -69,7 +76,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
     	
 	while(nextChar != EOF)
     {	
-		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit("A given paragraph has too many words.\n");
+		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit2("A given paragraph has too many words.\n");
 		
 //DO I NEED A SPACE AFTER THE LAST WORD???????		
 		
@@ -166,19 +173,25 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 
 
 int main(int argc, char **argv)
-{
-	int handleAtSignIsEnabled;
-	if (argc > 1)
-	{
-		handleAtSignIsEnabled = 1;		
-		charsPerLine = atoi(argv[1]);
-	}
-	else
-	{
+{	
+	if (argc < 3)
+	{	//maybe display a small help text. see linux command to get an example of how to structure the help text
 		fprintf(stderr, "Please provide the desired number of characters per line\n");
-		fprintf(stderr, "Example ./tf 100 for 100 characters per line\n");
+		fprintf(stderr, "Example ./tf -c 100 for 100 characters per line\n");
 		exit(EXIT_SUCCESS);
 	}
+	
+	//int i, j, handleAtSignIsEnabled = 0;
+	int handleAtSignIsEnabled = 0;
+	for (i = 1; i < argc; i++) 													// Skip argv[0] 
+    {
+        if (strcmp(argv[i], "-c") == 0)                                         //operations file
+        {
+            if(++i == argc)	perrorExit("Wrong number of arguments");
+			charsPerLine = atoi(argv[i]);
+		}
+		else if (strcmp(argv[i], "--handleAtSign") == 0)	handleAtSignIsEnabled = 1;
+    }
 	
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
@@ -211,7 +224,7 @@ int main(int argc, char **argv)
 		}
 	#endif	
 		
-	//Calculate the cost/badness for each possible string of words that can fit in one line.
+		//Calculate the cost/badness for each possible string of words that can fit in one line.
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
 		int curLineLength = 0, curLineStart, nextLineStart, currentCost, suffixBadness=0;
