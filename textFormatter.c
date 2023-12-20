@@ -43,7 +43,7 @@ int numberOfBytesInChar(unsigned char val)
 }
 
 /* Read a paragraph and store all its words in a buffer (i.e. wordsBuffer) */
-int readParagraph(FILE *inputFilePtr, int *wordsCount)
+int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled)
 {
 	memset(wordBuffer, 0, MAX_WORD_LENGTH);
 	*wordsCount = 0;
@@ -63,7 +63,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount)
 #endif	
 
 //Break text into single words and store them in a buffer.
-	int nextChar, charCount, consecutiveNewLineCharacters;
+	int nextChar, charCount, consecutiveNewLineCharacters, remainingBytes;
 	charCount = consecutiveNewLineCharacters = i = j = 0;
     while( isspace(nextChar = fgetc(inputFilePtr)) )	continue;			//Skip all whitespace at the beginning of the text
     	
@@ -108,9 +108,44 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount)
 				}
 				break;
 				
+			case '@':
+				if (handleAtSignIsEnabled)
+				{
+					wordBuffer[i++] = nextChar;
+					remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
+					while (remainingBytes)
+					{
+						nextChar = fgetc(inputFilePtr);
+						wordBuffer[i++] = nextChar;
+						remainingBytes--;
+					}
+					charCount++;
+					while ( (nextChar = fgetc(inputFilePtr) ) != '@')
+					{
+						wordBuffer[i++] = nextChar;
+						remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
+						while (remainingBytes)
+						{
+							nextChar = fgetc(inputFilePtr);
+							wordBuffer[i++] = nextChar;
+							remainingBytes--;
+						}
+						charCount++;
+					}
+					wordBuffer[i++] = nextChar;
+					remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
+					while (remainingBytes)
+					{
+						nextChar = fgetc(inputFilePtr);
+						wordBuffer[i++] = nextChar;
+						remainingBytes--;
+					}
+					charCount++;
+					break;
+				}
 			default:
 				wordBuffer[i++] = nextChar;
-				int remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
+				remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
 				while (remainingBytes)
 				{
 					nextChar = fgetc(inputFilePtr);
@@ -121,32 +156,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount)
 				consecutiveNewLineCharacters = 0;
 				break;
 		}
-		
-/*		if (nextChar == '@')
-		{
-			while ( (nextChar = fgetc(inputFilePtr) ) != '@')
-			{
-				wordBuffer[i++] = nextChar;
-				remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-				while (remainingBytes)
-				{
-					nextChar = fgetc(inputFilePtr);
-					wordBuffer[i++] = nextChar;
-					remainingBytes--;
-				}
-				charCount++;
-			}
-			wordBuffer[i++] = nextChar;
-			remainingBytes = numberOfBytesInChar((unsigned char)nextChar) - 1;
-			while (remainingBytes)
-			{
-				nextChar = fgetc(inputFilePtr);
-				wordBuffer[i++] = nextChar;
-				remainingBytes--;
-			}
-			charCount++;
-		}
-*/		
+				
 		nextChar = fgetc(inputFilePtr);
     }
 	
@@ -157,15 +167,18 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount)
 
 int main(int argc, char **argv)
 {
-	
-	if (argc > 1)	charsPerLine = atoi(argv[1]);
+	int handleAtSignIsEnabled;
+	if (argc > 1)
+	{
+		handleAtSignIsEnabled = 1;		
+		charsPerLine = atoi(argv[1]);
+	}
 	else
 	{
 		fprintf(stderr, "Please provide the desired number of characters per line\n");
 		fprintf(stderr, "Example ./tf 100 for 100 characters per line\n");
 		exit(EXIT_SUCCESS);
 	}
-	
 	
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
@@ -184,7 +197,7 @@ int main(int argc, char **argv)
 
 	/* Read 1st paragraph from randomText.txt */
 	int wordsCount;
-	int paragraphsRemain = readParagraph(inputFilePtr, &wordsCount);
+	int paragraphsRemain = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
 
 	while (paragraphsRemain)
 	{
@@ -348,7 +361,7 @@ int main(int argc, char **argv)
 		free(whitespace);
 		
 		
-		paragraphsRemain = readParagraph(inputFilePtr, &wordsCount);
+		paragraphsRemain = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
 	}
 
 
