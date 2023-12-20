@@ -18,7 +18,6 @@ typedef struct wordDetails
 
 //Delete and/or rename the following. Should they be global or declared in main. What is the difference.
 static int INFINITY = -1;
-static int CHARS_PER_LINE;
 char wordBuffer[MAX_WORD_LENGTH];
 wordDetails wordsBuffer[MAX_WORDS_PER_PARAGRAPH];
 int i, j;
@@ -44,9 +43,10 @@ int numberOfBytesInChar(unsigned char val)
 }
 
 /* Read a paragraph and store all its words in a buffer (i.e. wordsBuffer) */
-int readParagraph(FILE *inputFilePtr)
+int readParagraph(FILE *inputFilePtr, int *wordsCount)
 {
 	memset(wordBuffer, 0, MAX_WORD_LENGTH);
+	*wordsCount = 0;
 	
     for (i=0; i < MAX_WORDS_PER_PARAGRAPH; i++)
     {
@@ -101,8 +101,11 @@ int readParagraph(FILE *inputFilePtr)
 					charCount = i = 0;
 				}
 
-				if (++consecutiveNewLineCharacters > 1) return 1;	//two times \n
-
+				if (++consecutiveNewLineCharacters > 1) // \n found two consecutive times
+				{
+					*wordsCount = j;
+					return 1;
+				}
 				break;
 				
 			default:
@@ -146,7 +149,9 @@ int readParagraph(FILE *inputFilePtr)
 */		
 		nextChar = fgetc(inputFilePtr);
     }
-	return 0; //means EOF is reached
+	
+	*wordsCount = j;
+	return 0;		//means EOF is reached
 }
 
 
@@ -158,28 +163,30 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr, "Please provide the desired number of characters per line\n");
 		fprintf(stderr, "Example ./tf 100 for 100 characters per line\n");
-		return EXIT_FAILURE;
+		exit(EXIT_SUCCESS);
 	}
 	
 	
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
-    //if ((inputFilePtr = fopen("C:\\Users\\d-pkaltzias\\Desktop\\randomText.txt", "r") ) == NULL )
+
     if ((inputFilePtr = fopen("randomText.txt", "r") ) == NULL )
     {
-        fprintf(stderr, "File error 1\n");
+        fprintf(stderr, "Error while opening randomText.txt\n");
         exit(EXIT_FAILURE);
     }
-    //if ((outputFilePtr = fopen("C:\\Users\\d-pkaltzias\\Desktop\\formattedText.txt", "w") ) == NULL )
+
     if ((outputFilePtr = fopen("formattedText.txt", "w") ) == NULL )
     {
-        fprintf(stderr, "File error 2\n");
+        fprintf(stderr, "Error while opening formattedText.txt\n");
         exit(EXIT_FAILURE);
     }
 
-	int paragraphs_remain = readParagraph(inputFilePtr);
+	/* Read 1st paragraph from randomText.txt */
+	int wordsCount;
+	int paragraphsRemain = readParagraph(inputFilePtr, &wordsCount);
 
-	while (paragraphs_remain)
+	while (paragraphsRemain)
 	{
 	#if DEBUG1
 		fprintf(stderr, "wordsCount = %d\n", j);
@@ -192,9 +199,8 @@ int main(int argc, char **argv)
 	#endif	
 		
 	//Calculate the cost/badness for each possible string of words that can fit in one line.
-		if (j==0) exit(EXIT_SUCCESS);
+		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
-		int wordsCount = j;
 		int curLineLength = 0, curLineStart, nextLineStart, currentCost, suffixBadness=0;
 		int **costBuffer, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
@@ -342,7 +348,7 @@ int main(int argc, char **argv)
 		free(whitespace);
 		
 		
-		paragraphs_remain = readParagraph(inputFilePtr);
+		paragraphsRemain = readParagraph(inputFilePtr, &wordsCount);
 	}
 
 
