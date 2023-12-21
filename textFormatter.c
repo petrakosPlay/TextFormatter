@@ -3,6 +3,33 @@
 #include <string.h>
 #include <ctype.h>
 
+/* 
+Handle @ sign is not a very good option. First it does not currently handle the EOF value, but more
+importantly it cannot distinguish between @ signs used for e-mails and other stuff. So it should be used only
+for PM TXT files in STATMENT.
+
+leftovers:
+
+
+Handle command line arguments.
+If charsPerLine = 0, this is not valid. If -c xxx is given instead of a number, then it is not valid. If no charsPerLine
+is given then it is not valid.
+
+Decide global vs local variable declaration.
+
+There is also a small memory leak. Fix it. (It seems that it is fixed while fixing the EOF bug)
+I was actually not taking into consideration the last word of the text. So since I do it now, I also take care to free
+respective allocated space. I run some tests using valgrind and it shows no leaks.
+
+Refactor the formatting algorithm. Also make into a function and optionally call it using a pointer to the function.
+
+If one paragraph fits in a line then do not run the formatting argorithm. Just print the text as is.
+
+Handle exit function. You should free the resources before exiting when something unexpected happens.
+
+*/
+
+
 #define MAX_WORDS_PER_PARAGRAPH 1500
 #define MAX_WORD_LENGTH 150
 #define DEBUG 0
@@ -14,6 +41,7 @@ typedef struct wordDetails
     int wordLength;
 	int paddedSpaces;
 } wordDetails;
+
 
 
 //Delete and/or rename the following. Should they be global or declared in main. What is the difference.
@@ -35,10 +63,21 @@ void perrorExit(char *errorMsg) {
 	exit(EXIT_FAILURE);
 }
 
+/*
 void perrorExit2(char *errorMsg) {
 	fprintf(stderr, "%s\n", errorMsg);
 	exit(EXIT_FAILURE);
 }
+*/
+
+void showHelpText(void) {
+	fprintf(stdout, "\nFormat text so that each line has the same number of characters\n");
+	fprintf(stdout, "Example usage: ./tf -c 100   (for 100 characters per line)\n");
+	fprintf(stdout, "\n  -c			specify the desired number of characters per line\n");
+	fprintf(stdout, "  -h --help		display this help text\n");
+	fprintf(stdout, "  --handleAtSign	handles variables between @ signs in PM statment txt files\n\n");
+}
+
 
 /* Get the number of bytes per character of text */
 int numberOfBytesInChar(unsigned char val)
@@ -76,7 +115,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
     	
 	while(nextChar != EOF)
     {	
-		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit2("A given paragraph has too many words.\n");
+		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit("A given paragraph has too many words.\n");
 		
 //DO I NEED A SPACE AFTER THE LAST WORD???????		
 		
@@ -111,7 +150,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 				if (++consecutiveNewLineCharacters > 1) // \n found two consecutive times
 				{
 					*wordsCount = j;
-					return 1;
+					return 0;
 				}
 				break;
 				
@@ -150,6 +189,7 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 					charCount++;
 					break;
 				}
+				
 			default:
 				wordBuffer[i++] = nextChar;
 				bytesRemain = numberOfBytesInChar((unsigned char)nextChar) - 1;
@@ -166,32 +206,41 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 				
 		nextChar = fgetc(inputFilePtr);
     }
-	
+	//store last word before returning. It is mostly stored already but you need to increase the word count and add the space at the end of the word.
+	wordBuffer[i++] = ' ';
+	wordBuffer[i] = '\0';
+	wordsBuffer[j].word = malloc( (i+1) * sizeof(char) );
+	strncpy(wordsBuffer[j].word, wordBuffer, i+1);
+	wordsBuffer[j++].wordLength = charCount+1;
 	*wordsCount = j;
-	return 0;		//means EOF is reached
+	return 1;		//means EOF is reached
 }
 
 
 int main(int argc, char **argv)
-{	
-	if (argc < 3)
-	{	//maybe display a small help text. see linux command to get an example of how to structure the help text
-		fprintf(stderr, "Please provide the desired number of characters per line\n");
-		fprintf(stderr, "Example ./tf -c 100 for 100 characters per line\n");
-		exit(EXIT_SUCCESS);
-	}
-	
+{
 	//int i, j, handleAtSignIsEnabled = 0;
 	int handleAtSignIsEnabled = 0;
 	for (i = 1; i < argc; i++) 													// Skip argv[0] 
     {
         if (strcmp(argv[i], "-c") == 0)                                         //operations file
         {
-            if(++i == argc)	perrorExit("Wrong number of arguments");
+            if(++i == argc)
+			{
+				fprintf(stdout, "You must specify the desired number of characters per line.\n");
+				showHelpText();
+				exit(EXIT_SUCCESS);
+			}
 			charsPerLine = atoi(argv[i]);
+		}
+		else if ( (strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0) )
+		{
+			showHelpText();
+			exit(EXIT_SUCCESS);
 		}
 		else if (strcmp(argv[i], "--handleAtSign") == 0)	handleAtSignIsEnabled = 1;
     }
+	
 	
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
@@ -208,11 +257,9 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-	/* Read 1st paragraph from randomText.txt */
-	int wordsCount;
-	int paragraphsRemain = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
-
-	while (paragraphsRemain)
+	int wordsCount, EOFisReached;
+	
+	while (1)
 	{
 	#if DEBUG1
 		fprintf(stderr, "wordsCount = %d\n", j);
@@ -223,6 +270,7 @@ int main(int argc, char **argv)
 			fprintf(outputFilePtr, "%s\n", wordsBuffer[i].word);
 		}
 	#endif	
+		EOFisReached = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
 		
 		//Calculate the cost/badness for each possible string of words that can fit in one line.
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
@@ -373,8 +421,7 @@ int main(int argc, char **argv)
 		free(costBuffer);
 		free(whitespace);
 		
-		
-		paragraphsRemain = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
+		if (EOFisReached) break;
 	}
 
 
