@@ -309,7 +309,7 @@ int main(int argc, char **argv)
 					whitespace[i][j] = charsPerLine - curLineLength +1;
 					costBuffer[i][j] = whitespace[i][j] * whitespace[i][j];
 				}
-				//else    continue;
+				else break;
 			}
 		}
 		
@@ -326,17 +326,18 @@ int main(int argc, char **argv)
 
 		nextLineStart = wordsCount;
 		curLineStart  = wordsCount - 1;
-		for (; curLineStart >= 0 ; --curLineStart)		//where to start building the line
+		while (curLineStart >= 0)		//where to start building the line
 		{
 			while (curLineStart < nextLineStart)
 			{
 				if (costBuffer[curLineStart][nextLineStart-1] != INFINITY)	//the current set of  words fits in a line 
 				{
-					suffixBadness = (nextLineStart == wordsCount) ? 0 : badness[nextLineStart];	//the best i can do after the specified word
+				//	suffixBadness = (nextLineStart == wordsCount) ? 0 : badness[nextLineStart];	//the best i can do after the specified word
 					
 					
 					if (nextLineStart == wordsCount)	currentCost=0;		//new lines
-					else	currentCost = costBuffer[curLineStart][nextLineStart-1] + suffixBadness;
+					//else	currentCost = costBuffer[curLineStart][nextLineStart-1] + suffixBadness;
+					else	currentCost = costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
 					
 					
 					if (currentCost < badness[curLineStart] || badness[curLineStart] == INFINITY)
@@ -350,6 +351,7 @@ int main(int argc, char **argv)
 				nextLineStart --;
 			}
 			nextLineStart = wordsCount;
+			curLineStart--;
 		}
 		
 		
@@ -360,11 +362,17 @@ int main(int argc, char **argv)
 		//while (j != INFINITY)
 		while (1)
 		{
+			if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
+			{
+				//fprintf(outputFilePtr, "\n");
+				for( ; i < j; ++i)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+				break;
+			}
 			if (whitespace[i][j-1] > 0 && curLineWords > 1)
 			{
 				while (whitespace[i][j-1] >= curLineSpacePositions)
 				{
-					for (k = i; k < i+curLineSpacePositions; k++)		wordsBuffer[k].paddedSpaces++;
+					for (k = i; k < i+curLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
 					whitespace[i][j-1] -= curLineSpacePositions;
 				}
 				//padSpacesEvenly(i, j);
@@ -395,12 +403,12 @@ int main(int argc, char **argv)
 				++i;
 			}
 			j = lineBreaks[i];
-			if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
+			/*if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
 			{
 				fprintf(outputFilePtr, "\n");
 				for( ; i < j; ++i)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
 				break;
-			}
+			}*/
 			
 			//if (j == INFINITY) break;
 			fprintf(outputFilePtr, "\n");
