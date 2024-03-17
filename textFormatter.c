@@ -275,6 +275,7 @@ int main(int argc, char **argv)
 		//Calculate the cost/badness for each possible string of words that can fit in one line.
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
+		
 		int curLineLength = 0, curLineStart, nextLineStart, currentCost, suffixBadness=0;
 		int **costBuffer, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
