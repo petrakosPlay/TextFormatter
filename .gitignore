@@ -5,9 +5,9 @@
 *.o
 
 #Folders
-
+old
 
 #Other
-
-*copy*
+randomText
+formattedText
 

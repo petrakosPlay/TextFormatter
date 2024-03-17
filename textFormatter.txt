@@ -1,0 +1,17 @@
+- perform checks for maxword length and CHARS_PER_LINE
+- break it down to functions or multiple c source files
+- What happens if i have 2 words and i should put more than one space in between? When would this case occur?
+- Fix the printing of the last space at the end of each line.
+- Should MAX_WORDS be an input argument??
+- When the random text fits in just one line should the line be padded with spaces to reach CHARS_PER_LINE
+or simply be printed??
+
+- What happens with the path to the 2 txts for input and output text when i install the app to another PC??
+So far the path is pinned down in the code.
+
+
+
+gdb32 --args ./textFormatter 103
+gcc -Wall -g -o textFormatter textFormatter.c  
+ gdb32 .\textFormatter
+ 
