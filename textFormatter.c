@@ -280,7 +280,6 @@ int main(int argc, char **argv)
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
 		
-		int curLineLength = 0, curLineStart, nextLineStart, currentCost; //suffixBadness=0;
 		int **costBuffer, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
 		costBuffer = whitespace = NULL;
@@ -300,6 +299,8 @@ int main(int argc, char **argv)
 			badness[i] = lineBreaks[i] = INFINITY;
 		}
 		
+		
+		int curLineLength;
 		for (i=0; i < wordsCount; ++i)
 		{
 			curLineLength = 0;
@@ -326,28 +327,32 @@ int main(int argc, char **argv)
 		}
 	#endif
 
-		nextLineStart = wordsCount;
-		curLineStart  = wordsCount - 1;
+
+/* Start by building the last line of text. Keep the cost of the available combinations.
+   Then once you cannot fit more words in a line, then try to build combinations for the previous line.
+   Store the cost of the line, while taking into consideration the cost of the next line for each possible
+   combination of words
+*/
+		int currentLineCost;
+		int indexOfFirstWordOfCurrentLine = wordsCount - 1;
+		int indexOfLastWordOfCurrentLine  = wordsCount - 1;
 		bool currentSetOfWordsFitsInALine, currentLineIsLastLine;
-		for (; curLineStart >= 0; --curLineStart)		//where to start building the line
-		{
-			for (; curLineStart < nextLineStart; --nextLineStart)
-			{
-				currentSetOfWordsFitsInALine = (costBuffer[curLineStart][nextLineStart-1] < INFINITY) ? true : false;
-				currentLineIsLastLine = (nextLineStart == wordsCount) ? true : false;
+		
+		for (; indexOfFirstWordOfCurrentLine >= 0; --indexOfFirstWordOfCurrentLine) {
+			for (; indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine; --indexOfLastWordOfCurrentLine) {
 				
-				if (currentSetOfWordsFitsInALine)
-				{		
-					currentCost = (currentLineIsLastLine) ? 0 : costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
-						
-					if (currentCost < badness[curLineStart])
-					{
-						badness[curLineStart] = currentCost;
-						lineBreaks[curLineStart] = nextLineStart;
-					}
+				currentSetOfWordsFitsInALine = (costBuffer[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] < INFINITY) ? true : false;
+				if (!currentSetOfWordsFitsInALine)	continue;
+
+				currentLineIsLastLine = (indexOfLastWordOfCurrentLine == wordsCount-1) ? true : false;
+				currentLineCost = (currentLineIsLastLine) ? 0 : costBuffer[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] + badness[indexOfLastWordOfCurrentLine+1];
+				
+				if (currentLineCost < badness[indexOfFirstWordOfCurrentLine]) {
+					badness[indexOfFirstWordOfCurrentLine] = currentLineCost;
+					lineBreaks[indexOfFirstWordOfCurrentLine] = indexOfLastWordOfCurrentLine + 1;
 				}
 			}
-			nextLineStart = wordsCount;
+			indexOfLastWordOfCurrentLine = wordsCount-1;
 		}
 		
 		
