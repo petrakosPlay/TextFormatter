@@ -280,14 +280,14 @@ int main(int argc, char **argv)
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
 		
-		int **costBuffer, **whitespace, *badness, *lineBreaks;
+		int **lineCost, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
-		costBuffer = whitespace = NULL;
-		costBuffer = malloc(wordsCount * sizeof(int *));
+		lineCost = whitespace = NULL;
+		lineCost = malloc(wordsCount * sizeof(int *));
 		whitespace = malloc(wordsCount * sizeof(int *));
 		for (i=0; i < wordsCount; i++)
 		{
-			costBuffer[i] = malloc(wordsCount * sizeof(int));
+			lineCost[i] = malloc(wordsCount * sizeof(int));
 			whitespace[i] = malloc(wordsCount * sizeof(int));
 		}
 		badness    = malloc(wordsCount * sizeof(int));
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 	 
 		for (i=0; i < wordsCount; ++i)
 		{
-			for (j=0; j < wordsCount; ++j)  costBuffer[i][j] = whitespace[i][j] = INFINITY;
+			for (j=0; j < wordsCount; ++j)  lineCost[i][j] = whitespace[i][j] = INFINITY;
 			badness[i] = lineBreaks[i] = INFINITY;
 		}
 		
@@ -310,7 +310,7 @@ int main(int argc, char **argv)
 				if (curLineLength-1 <= charsPerLine)      //current string of words fits in one line without the last empty space
 				{
 					whitespace[i][j] = charsPerLine - curLineLength +1;
-					costBuffer[i][j] = whitespace[i][j] * whitespace[i][j];
+					lineCost[i][j] = whitespace[i][j] * whitespace[i][j];
 				}
 				else break;
 			}
@@ -321,7 +321,7 @@ int main(int argc, char **argv)
 		{
 			for (j=0; j < wordsCount; ++j)
 			{
-				fprintf(stderr, "%3d,", costBuffer[i][j]);
+				fprintf(stderr, "%3d,", lineCost[i][j]);
 			}
 			fprintf(stderr, "\n");
 		}
@@ -341,11 +341,11 @@ int main(int argc, char **argv)
 		for (; indexOfFirstWordOfCurrentLine >= 0; --indexOfFirstWordOfCurrentLine) {
 			for (; indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine; --indexOfLastWordOfCurrentLine) {
 				
-				currentSetOfWordsFitsInALine = (costBuffer[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] < INFINITY) ? true : false;
+				currentSetOfWordsFitsInALine = (lineCost[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] < INFINITY) ? true : false;
 				if (!currentSetOfWordsFitsInALine)	continue;
 
 				currentLineIsLastLine = (indexOfLastWordOfCurrentLine == wordsCount-1) ? true : false;
-				currentLineCost = (currentLineIsLastLine) ? 0 : costBuffer[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] + badness[indexOfLastWordOfCurrentLine+1];
+				currentLineCost = (currentLineIsLastLine) ? 0 : lineCost[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] + badness[indexOfLastWordOfCurrentLine+1];
 				
 				if (currentLineCost < badness[indexOfFirstWordOfCurrentLine]) {
 					badness[indexOfFirstWordOfCurrentLine] = currentLineCost;
@@ -426,12 +426,12 @@ int main(int argc, char **argv)
 		for (i=0; i < wordsCount; ++i)
 		{
 			free(wordsBuffer[i].word);
-			free(*(costBuffer+i));
+			free(*(lineCost+i));
 			free(*(whitespace+i));
 		}
 		free(lineBreaks);
 		free(badness);
-		free(costBuffer);
+		free(lineCost);
 		free(whitespace);
 		
 		if (EOFisReached) break;
