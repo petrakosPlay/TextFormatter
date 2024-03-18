@@ -93,7 +93,7 @@ int numberOfBytesInChar(unsigned char val)
 }
 
 /* Read a paragraph and store all its words in a buffer (i.e. wordsBuffer) */
-int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled)
+int readNextParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled)
 {
 	memset(wordBuffer, 0, MAX_WORD_LENGTH);
 	*wordsCount = 0;
@@ -223,9 +223,8 @@ int readParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEnabled
 
 int main(int argc, char **argv)
 {
-	//int i, j, handleAtSignIsEnabled = 0;
 	int handleAtSignIsEnabled = 0;
-	for (i = 1; i < argc; i++) 													// Skip argv[0] 
+	for (i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "-c") == 0)                                         //operations file
         {
@@ -261,11 +260,11 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+
 	int wordsCount, EOFisReached;
-	
 	while (1)
 	{
-	#if DEBUG1
+#if DEBUG1
 		fprintf(stderr, "wordsCount = %d\n", j);
 		for (i=0; i < j; ++i)
 		{
@@ -273,16 +272,15 @@ int main(int argc, char **argv)
 			fprintf(outputFilePtr, "NEW\n");
 			fprintf(outputFilePtr, "%s\n", wordsBuffer[i].word);
 		}
-	#endif	
-		EOFisReached = readParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
+#endif	
+		EOFisReached = readNextParagraph(inputFilePtr, &wordsCount, handleAtSignIsEnabled);
 		
-		//Calculate the cost/badness for each possible string of words that can fit in one line.
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
-		
 		int **lineCost, **whitespace, *badness, *lineBreaks;
-		badness = lineBreaks = NULL;
 		lineCost = whitespace = NULL;
+		badness = lineBreaks = NULL;
+		
 		lineCost = malloc(wordsCount * sizeof(int *));
 		whitespace = malloc(wordsCount * sizeof(int *));
 		for (i=0; i < wordsCount; i++)
@@ -293,26 +291,23 @@ int main(int argc, char **argv)
 		badness    = malloc(wordsCount * sizeof(int));
 		lineBreaks = malloc(wordsCount * sizeof(int));
 	 
-		for (i=0; i < wordsCount; ++i)
-		{
-			for (j=0; j < wordsCount; ++j)  lineCost[i][j] = whitespace[i][j] = INFINITY;
+		for (i=0; i < wordsCount; ++i) {
 			badness[i] = lineBreaks[i] = INFINITY;
+			for (j=0; j < wordsCount; ++j)
+				lineCost[i][j] = whitespace[i][j] = INFINITY;			
 		}
 		
 		
-		int curLineLength;
-		for (i=0; i < wordsCount; ++i)
-		{
-			curLineLength = 0;
-			for (j=i; j < wordsCount; ++j)
-			{
-				curLineLength += wordsBuffer[j].wordLength;
-				if (curLineLength-1 <= charsPerLine)      //current string of words fits in one line without the last empty space
-				{
-					whitespace[i][j] = charsPerLine - curLineLength +1;
-					lineCost[i][j] = whitespace[i][j] * whitespace[i][j];
-				}
-				else break;
+		int currentLineLength;
+		for (i=0; i < wordsCount; ++i) {
+			currentLineLength = 0;
+			for (j=i; j < wordsCount; ++j) {
+				
+				currentLineLength += wordsBuffer[j].wordLength;
+				if (currentLineLength > charsPerLine) break;
+				
+				whitespace[i][j] = charsPerLine - currentLineLength + 1;
+				lineCost[i][j] = whitespace[i][j] * whitespace[i][j];
 			}
 		}
 		
@@ -332,6 +327,7 @@ int main(int argc, char **argv)
    Then once you cannot fit more words in a line, then try to build combinations for the previous line.
    Store the cost of the line, while taking into consideration the cost of the next line for each possible
    combination of words
+   		//Calculate the cost/badness for each possible string of words that can fit in one line.
 */
 		int currentLineCost;
 		int indexOfFirstWordOfCurrentLine = wordsCount - 1;
