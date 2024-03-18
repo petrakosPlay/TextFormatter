@@ -291,15 +291,14 @@ int main(int argc, char **argv)
 			costBuffer[i] = malloc(wordsCount * sizeof(int));
 			whitespace[i] = malloc(wordsCount * sizeof(int));
 		}
-		badness = malloc( (wordsCount+1) * sizeof(int));
-		lineBreaks = malloc( (wordsCount+1) * sizeof(int));
+		badness = malloc( wordsCount * sizeof(int) );
+		lineBreaks = malloc( wordsCount * sizeof(int) );
 	 
 		for (i=0; i < wordsCount; ++i)
 		{
 			for (j=0; j < wordsCount; ++j)  costBuffer[i][j] = whitespace[i][j] = INFINITY;
 			badness[i] = lineBreaks[i] = INFINITY;
 		}
-		badness[i] = lineBreaks[i] = INFINITY;
 		
 		for (i=0; i < wordsCount; ++i)
 		{
