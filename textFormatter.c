@@ -287,12 +287,11 @@ int main(int argc, char **argv)
 		whitespace = malloc(wordsCount * sizeof(int *));
 		for (i=0; i < wordsCount; i++)
 		{
-			//*(costBuffer + i) = malloc(wordsCount * sizeof(int));
 			costBuffer[i] = malloc(wordsCount * sizeof(int));
 			whitespace[i] = malloc(wordsCount * sizeof(int));
 		}
-		badness = malloc( wordsCount * sizeof(int) );
-		lineBreaks = malloc( wordsCount * sizeof(int) );
+		badness    = malloc(wordsCount * sizeof(int));
+		lineBreaks = malloc(wordsCount * sizeof(int));
 	 
 		for (i=0; i < wordsCount; ++i)
 		{
@@ -333,22 +332,14 @@ int main(int argc, char **argv)
 			while (curLineStart < nextLineStart)
 			{
 				if (costBuffer[curLineStart][nextLineStart-1] < INFINITY)	//the current set of  words fits in a line 
-				{
-				//	suffixBadness = (nextLineStart == wordsCount) ? 0 : badness[nextLineStart];	//the best i can do after the specified word
-					
-					
-					if (nextLineStart == wordsCount)	currentCost=0;		//new lines
-					//else	currentCost = costBuffer[curLineStart][nextLineStart-1] + suffixBadness;
-					else	currentCost = costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
-					
-					
+				{	
+					currentCost = (nextLineStart == wordsCount) ? 0 : costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
+						
 					if (currentCost < badness[curLineStart])
 					{
 						badness[curLineStart] = currentCost;
 						lineBreaks[curLineStart] = nextLineStart;
 					}
-					//badness[curLineStart] = costBuffer[curLineStart][nextLineStart-1]
-					//lineBreaks[curLineStart] = nextLineStart;
 				}
 				nextLineStart --;
 			}
