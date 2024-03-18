@@ -27,6 +27,8 @@ If one paragraph fits in a line then do not run the formatting argorithm. Just p
 
 Handle exit function. You should free the resources before exiting when something unexpected happens.
 
+
+if chars per line is less than the length of the biggest word then there is a problem.
 */
 
 
@@ -45,14 +47,15 @@ typedef struct wordDetails
 
 
 //Delete and/or rename the following. Should they be global or declared in main. What is the difference.
-static int INFINITY = -1;
+
 char wordBuffer[MAX_WORD_LENGTH];
 wordDetails wordsBuffer[MAX_WORDS_PER_PARAGRAPH];
 
 
 int i, j;
 int charsPerLine;
-
+const int INFINITY = MAX_WORDS_PER_PARAGRAPH * MAX_WORD_LENGTH;
+//const int INFINITY = -1;
 
 /*------------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------------*/
@@ -276,7 +279,7 @@ int main(int argc, char **argv)
 		if (wordsCount == 0) exit(EXIT_SUCCESS);
 		
 		
-		int curLineLength = 0, curLineStart, nextLineStart, currentCost, suffixBadness=0;
+		int curLineLength = 0, curLineStart, nextLineStart, currentCost; //suffixBadness=0;
 		int **costBuffer, **whitespace, *badness, *lineBreaks;
 		badness = lineBreaks = NULL;
 		costBuffer = whitespace = NULL;
@@ -330,7 +333,7 @@ int main(int argc, char **argv)
 		{
 			while (curLineStart < nextLineStart)
 			{
-				if (costBuffer[curLineStart][nextLineStart-1] != INFINITY)	//the current set of  words fits in a line 
+				if (costBuffer[curLineStart][nextLineStart-1] < INFINITY)	//the current set of  words fits in a line 
 				{
 				//	suffixBadness = (nextLineStart == wordsCount) ? 0 : badness[nextLineStart];	//the best i can do after the specified word
 					
@@ -340,7 +343,7 @@ int main(int argc, char **argv)
 					else	currentCost = costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
 					
 					
-					if (currentCost < badness[curLineStart] || badness[curLineStart] == INFINITY)
+					if (currentCost < badness[curLineStart])
 					{
 						badness[curLineStart] = currentCost;
 						lineBreaks[curLineStart] = nextLineStart;
@@ -390,8 +393,11 @@ int main(int argc, char **argv)
 			while (i < j)
 			{
 				//void writeLine()
-				//if (i == j-1)	fprintf(outputFilePtr, "%.*s", wordsBuffer[i].wordLength -1, wordsBuffer[i].word);
-				if (i == j-1)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+				if (i == j-1)
+				{
+					//wordsBuffer[i].word[wordsBuffer[i].wordLength+1] = '\0';
+					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+				}
 				else
 				{
 					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
