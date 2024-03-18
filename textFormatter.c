@@ -354,28 +354,27 @@ int main(int argc, char **argv)
 		
 		i = 0;
 		j = lineBreaks[i];
-		int curLineWords = j - i, padDistance = 0, k = 0;			//number of words that will be printed in the current line
-		int curLineSpacePositions = curLineWords -1;				//the number of positions between words that can be padded with spaces
-		//while (j != INFINITY)
+		int currentLineWords = j - i, padDistance = 0, k = 0;			//number of words that will be printed in the current line
+		int currentLineSpacePositions = currentLineWords -1;				//the number of positions between words that can be padded with spaces
+
 		while (1)
 		{
 			if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
 			{
-				//fprintf(outputFilePtr, "\n");
 				for( ; i < j; ++i)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
 				break;
 			}
-			if (whitespace[i][j-1] > 0 && curLineWords > 1)
+			if (whitespace[i][j-1] > 0 && currentLineWords > 1)
 			{
-				while (whitespace[i][j-1] >= curLineSpacePositions)
+				while (whitespace[i][j-1] >= currentLineSpacePositions)
 				{
-					for (k = i; k < i+curLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
-					whitespace[i][j-1] -= curLineSpacePositions;
+					for (k = i; k < i+currentLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
+					whitespace[i][j-1] -= currentLineSpacePositions;
 				}
 				//padSpacesEvenly(i, j);
 				if (whitespace[i][j-1] > 0)
 				{
-					padDistance = curLineSpacePositions / whitespace[i][j-1];
+					padDistance = currentLineSpacePositions / whitespace[i][j-1];
 					//for (k = i+padDistance; k < j; k+= padDistance)
 					for (k = i+padDistance-1; k < j-1 && whitespace[i][j-1] > 0; k+= padDistance)
 					{
@@ -395,7 +394,7 @@ int main(int argc, char **argv)
 				else
 				{
 					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
-					//if (--curLineWords > 1)
+					//if (--currentLineWords > 1)
 					//{
 						for (k=0; k < wordsBuffer[i].paddedSpaces; k++)		fprintf(outputFilePtr, " ");
 					//}
@@ -412,8 +411,8 @@ int main(int argc, char **argv)
 			
 			//if (j == INFINITY) break;
 			fprintf(outputFilePtr, "\n");
-			curLineWords = j - i;
-			curLineSpacePositions = curLineWords -1;
+			currentLineWords = j - i;
+			currentLineSpacePositions = currentLineWords -1;
 		}	
 		
 		fprintf(outputFilePtr, "\n\n");
