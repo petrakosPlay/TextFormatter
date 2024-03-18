@@ -352,66 +352,62 @@ int main(int argc, char **argv)
 		}
 		
 		
-		i = 0;
-		j = lineBreaks[i];
-		int currentLineWords = j - i, padDistance = 0, k = 0;			//number of words that will be printed in the current line
+		indexOfFirstWordOfCurrentLine = 0;
+		indexOfLastWordOfCurrentLine = lineBreaks[indexOfFirstWordOfCurrentLine] - 1;
+		int currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1; //number of words that will be printed in the current line
 		int currentLineSpacePositions = currentLineWords -1;				//the number of positions between words that can be padded with spaces
+		int padDistance = 0, k = 0;
 
 		while (1)
 		{
-			if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
+			if (indexOfLastWordOfCurrentLine == wordsCount - 1)		//if LastWordOfCurrentLine is last word of paragraph, i.e. current line is the last line to be printed.
 			{
-				for( ; i < j; ++i)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+				for(i = indexOfFirstWordOfCurrentLine ; i <= indexOfLastWordOfCurrentLine; ++i)
+					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
 				break;
 			}
-			if (whitespace[i][j-1] > 0 && currentLineWords > 1)
+			
+			
+			if (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0 && currentLineWords > 1)	//if this line has more than one word and also needs padding with spaces
 			{
-				while (whitespace[i][j-1] >= currentLineSpacePositions)
+				while (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] >= currentLineSpacePositions)
 				{
-					for (k = i; k < i+currentLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
-					whitespace[i][j-1] -= currentLineSpacePositions;
+					for (k = indexOfFirstWordOfCurrentLine; k < indexOfFirstWordOfCurrentLine+currentLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
+					whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] -= currentLineSpacePositions;
 				}
+				
 				//padSpacesEvenly(i, j);
-				if (whitespace[i][j-1] > 0)
+				if (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0)
 				{
-					padDistance = currentLineSpacePositions / whitespace[i][j-1];
-					//for (k = i+padDistance; k < j; k+= padDistance)
-					for (k = i+padDistance-1; k < j-1 && whitespace[i][j-1] > 0; k+= padDistance)
+					padDistance = currentLineSpacePositions / whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine];
+					for (k = indexOfFirstWordOfCurrentLine+padDistance-1; k < indexOfLastWordOfCurrentLine && whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0; k+= padDistance)
 					{
 						wordsBuffer[k].paddedSpaces++;
-						whitespace[i][j-1]--;
+						whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine]--;
 					}
 				}
 			}
-			while (i < j)
+			
+			
+			while (indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine)
 			{
-				//void writeLine()
-				if (i == j-1)
+				if (indexOfFirstWordOfCurrentLine == indexOfLastWordOfCurrentLine)
 				{
-					//wordsBuffer[i].word[wordsBuffer[i].wordLength+1] = '\0';
-					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+					fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
 				}
 				else
 				{
-					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
-					//if (--currentLineWords > 1)
-					//{
-						for (k=0; k < wordsBuffer[i].paddedSpaces; k++)		fprintf(outputFilePtr, " ");
-					//}
+					fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
+						for (k=0; k < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; k++)		fprintf(outputFilePtr, " ");
+	
 				}
-				++i;
+				++indexOfFirstWordOfCurrentLine;
 			}
-			j = lineBreaks[i];
-			/*if (j == wordsCount || j == -1)		//j==-1 suggests there is only one line, but better check it again.
-			{
-				fprintf(outputFilePtr, "\n");
-				for( ; i < j; ++i)	fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
-				break;
-			}*/
 			
-			//if (j == INFINITY) break;
+			indexOfLastWordOfCurrentLine = lineBreaks[indexOfLastWordOfCurrentLine] - 1;
+			
 			fprintf(outputFilePtr, "\n");
-			currentLineWords = j - i;
+			currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1;
 			currentLineSpacePositions = currentLineWords -1;
 		}	
 		
