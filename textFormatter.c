@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 /* 
 Handle @ sign is not a very good option. First it does not currently handle the EOF value, but more
@@ -327,13 +328,17 @@ int main(int argc, char **argv)
 
 		nextLineStart = wordsCount;
 		curLineStart  = wordsCount - 1;
-		while (curLineStart >= 0)		//where to start building the line
+		bool currentSetOfWordsFitsInALine, currentLineIsLastLine;
+		for (; curLineStart >= 0; --curLineStart)		//where to start building the line
 		{
-			while (curLineStart < nextLineStart)
+			for (; curLineStart < nextLineStart; --nextLineStart)
 			{
-				if (costBuffer[curLineStart][nextLineStart-1] < INFINITY)	//the current set of  words fits in a line 
-				{	
-					currentCost = (nextLineStart == wordsCount) ? 0 : costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
+				currentSetOfWordsFitsInALine = (costBuffer[curLineStart][nextLineStart-1] < INFINITY) ? true : false;
+				currentLineIsLastLine = (nextLineStart == wordsCount) ? true : false;
+				
+				if (currentSetOfWordsFitsInALine)
+				{		
+					currentCost = (currentLineIsLastLine) ? 0 : costBuffer[curLineStart][nextLineStart-1] + badness[nextLineStart];
 						
 					if (currentCost < badness[curLineStart])
 					{
@@ -341,10 +346,8 @@ int main(int argc, char **argv)
 						lineBreaks[curLineStart] = nextLineStart;
 					}
 				}
-				nextLineStart --;
 			}
 			nextLineStart = wordsCount;
-			curLineStart--;
 		}
 		
 		
