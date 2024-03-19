@@ -353,13 +353,15 @@ int main(int argc, char **argv)
 		
 		
 		indexOfFirstWordOfCurrentLine = 0;
-		indexOfLastWordOfCurrentLine = lineBreaks[indexOfFirstWordOfCurrentLine] - 1;
-		int currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1; //number of words that will be printed in the current line
-		int currentLineSpacePositions = currentLineWords -1;				//the number of positions between words that can be padded with spaces
-		int padDistance = 0;
+		int padDistance = 0, currentLineWords, currentLineSpacePositions;
 
 		while (1)
 		{
+			indexOfLastWordOfCurrentLine = lineBreaks[indexOfFirstWordOfCurrentLine] - 1;
+			currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1; //number of words that will be printed in the current line
+			currentLineSpacePositions = currentLineWords -1;				//the number of positions between words that can be padded with spaces
+		
+		
 			currentLineIsLastLine = (indexOfLastWordOfCurrentLine == wordsCount - 1) ? true : false;
 			if (currentLineIsLastLine)
 			{
@@ -400,11 +402,7 @@ int main(int argc, char **argv)
 				++indexOfFirstWordOfCurrentLine;
 			}
 			
-			indexOfLastWordOfCurrentLine = lineBreaks[indexOfLastWordOfCurrentLine] - 1;
-			
 			fprintf(outputFilePtr, "\n");
-			currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1;
-			currentLineSpacePositions = currentLineWords -1;
 		}	
 		
 		fprintf(outputFilePtr, "\n\n");
