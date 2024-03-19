@@ -30,6 +30,10 @@ Handle exit function. You should free the resources before exiting when somethin
 
 
 if chars per line is less than the length of the biggest word then there is a problem.
+
+
+How should I pad when there is only one word in a line. Do I pad from the left?
+
 */
 
 
@@ -394,11 +398,10 @@ int main(int argc, char **argv)
 			
 			
 			while (indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine)
-			{
+			{	
 				fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
-				//if (indexOfFirstWordOfCurrentLine!= indexOfLastWordOfCurrentLine)
-					for (i=0; i < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; i++)
-						fprintf(outputFilePtr, " ");
+				for (i=0; i < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; i++)
+					fprintf(outputFilePtr, " ");
 				++indexOfFirstWordOfCurrentLine;
 			}
 			
