@@ -356,7 +356,7 @@ int main(int argc, char **argv)
 		indexOfLastWordOfCurrentLine = lineBreaks[indexOfFirstWordOfCurrentLine] - 1;
 		int currentLineWords = indexOfLastWordOfCurrentLine - indexOfFirstWordOfCurrentLine + 1; //number of words that will be printed in the current line
 		int currentLineSpacePositions = currentLineWords -1;				//the number of positions between words that can be padded with spaces
-		int padDistance = 0, k = 0;
+		int padDistance = 0;
 
 		while (1)
 		{
@@ -373,7 +373,8 @@ int main(int argc, char **argv)
 			{
 				while (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] >= currentLineSpacePositions)
 				{
-					for (k = indexOfFirstWordOfCurrentLine; k < indexOfFirstWordOfCurrentLine+currentLineSpacePositions; k++)	wordsBuffer[k].paddedSpaces++;
+					for (i = indexOfFirstWordOfCurrentLine; i < indexOfFirstWordOfCurrentLine+currentLineSpacePositions; i++)
+						wordsBuffer[i].paddedSpaces++;
 					whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] -= currentLineSpacePositions;
 				}
 				
@@ -381,9 +382,9 @@ int main(int argc, char **argv)
 				if (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0)
 				{
 					padDistance = currentLineSpacePositions / whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine];
-					for (k = indexOfFirstWordOfCurrentLine+padDistance-1; k < indexOfLastWordOfCurrentLine && whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0; k+= padDistance)
+					for (i = indexOfFirstWordOfCurrentLine+padDistance-1; i < indexOfLastWordOfCurrentLine && whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0; i+= padDistance)
 					{
-						wordsBuffer[k].paddedSpaces++;
+						wordsBuffer[i].paddedSpaces++;
 						whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine]--;
 					}
 				}
@@ -392,16 +393,10 @@ int main(int argc, char **argv)
 			
 			while (indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine)
 			{
-				if (indexOfFirstWordOfCurrentLine == indexOfLastWordOfCurrentLine)
-				{
-					fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
-				}
-				else
-				{
-					fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
-						for (k=0; k < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; k++)		fprintf(outputFilePtr, " ");
-	
-				}
+				fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
+				//if (indexOfFirstWordOfCurrentLine!= indexOfLastWordOfCurrentLine)
+					for (i=0; i < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; i++)
+						fprintf(outputFilePtr, " ");
 				++indexOfFirstWordOfCurrentLine;
 			}
 			
