@@ -360,7 +360,8 @@ int main(int argc, char **argv)
 
 		while (1)
 		{
-			if (indexOfLastWordOfCurrentLine == wordsCount - 1)		//if LastWordOfCurrentLine is last word of paragraph, i.e. current line is the last line to be printed.
+			currentLineIsLastLine = (indexOfLastWordOfCurrentLine == wordsCount - 1) ? true : false;
+			if (currentLineIsLastLine)
 			{
 				for(i = indexOfFirstWordOfCurrentLine ; i <= indexOfLastWordOfCurrentLine; ++i)
 					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
