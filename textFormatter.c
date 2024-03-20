@@ -358,7 +358,8 @@ int main(int argc, char **argv)
 		
 		indexOfFirstWordOfCurrentLine = 0;
 		int padDistance = 0, currentLineWords, currentLineSpacePositions;
-
+		int c, k =0;
+		
 		while (1)
 		{
 			indexOfLastWordOfCurrentLine = lineBreaks[indexOfFirstWordOfCurrentLine] - 1;
@@ -369,9 +370,15 @@ int main(int argc, char **argv)
 			currentLineIsLastLine = (indexOfLastWordOfCurrentLine == wordsCount - 1) ? true : false;
 			if (currentLineIsLastLine)
 			{
-				for(i = indexOfFirstWordOfCurrentLine ; i <= indexOfLastWordOfCurrentLine; ++i)
+				for(i = indexOfFirstWordOfCurrentLine ; i < indexOfLastWordOfCurrentLine; ++i)
 					fprintf(outputFilePtr, "%s", wordsBuffer[i].word);
+				k =0;
+				while( (c = *(wordsBuffer[i].word + k)) != ' ') {
+					fprintf(outputFilePtr, "%c", c);
+					k++;
+				}
 				break;
+				
 			}
 			
 			
@@ -397,13 +404,19 @@ int main(int argc, char **argv)
 			}
 			
 			
-			while (indexOfFirstWordOfCurrentLine <= indexOfLastWordOfCurrentLine)
+			while (indexOfFirstWordOfCurrentLine < indexOfLastWordOfCurrentLine)
 			{	
 				fprintf(outputFilePtr, "%s", wordsBuffer[indexOfFirstWordOfCurrentLine].word);
 				for (i=0; i < wordsBuffer[indexOfFirstWordOfCurrentLine].paddedSpaces; i++)
 					fprintf(outputFilePtr, " ");
 				++indexOfFirstWordOfCurrentLine;
 			}
+			k =0;
+			while( (c = *(wordsBuffer[indexOfFirstWordOfCurrentLine].word + k)) != ' ') {
+				fprintf(outputFilePtr, "%c", c);
+				k++;
+			}
+			++indexOfFirstWordOfCurrentLine;
 			
 			fprintf(outputFilePtr, "\n");
 		}	
