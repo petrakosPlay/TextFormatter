@@ -15,3 +15,22 @@ gdb32 --args ./textFormatter 103
 gcc -Wall -g -o textFormatter textFormatter.c  
  gdb32 .\textFormatter
  
+------------------------------------------------------------------------------------------------------------ 
+//TODOs
+
+- Remove types from variable names. ex. outputFilePtr to outputFile
+- I remove the space at the end of each line but the code is lets say not so elegant. I think it may be better
+if i change the code and do not store the space char after each word. Or maybe keep the current approach but
+find a better way to write the fix.
+- There is a known bug when the requested CPL (characters per line) is less than the length of the biggest
+word in the text. I should exit the program if I encounter such a case.
+- In terms of refactoring I could write a few functions in order to "package" some tasks in the code or even
+to help make some conditions more readable. 
+
+if (whitespace[indexOfFirstWordOfCurrentLine][indexOfLastWordOfCurrentLine] > 0 && currentLineWords > 1)	//if this line has more than one word and also needs padding with spaces
+ 
+this condition could be written as 
+
+if (line_requires_padding_with_spaces).
+
+- Also I have a few things (TODOs) written inside the source code as well.
