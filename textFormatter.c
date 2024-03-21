@@ -67,7 +67,7 @@ const int INFINITY = MAX_WORDS_PER_PARAGRAPH * MAX_WORD_LENGTH;
 /* Helper functions */
 
 void perrorExit(char *errorMsg) {
-	fprintf(stderr, "%s\n", errorMsg);
+	fprintf(stderr, "%s\nExiting\n", errorMsg);
 	exit(EXIT_FAILURE);
 }
 
@@ -123,7 +123,9 @@ int readNextParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEna
     	
 	while(nextChar != EOF)
     {	
-		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit("A given paragraph has too many words.\n");
+		if (j == MAX_WORDS_PER_PARAGRAPH)	perrorExit("A given paragraph has too many words.");
+		if (charCount + 1 > charsPerLine)	perrorExit("A given word is longer than the characters per line requested.");
+		
 		
 //DO I NEED A SPACE AFTER THE LAST WORD???????		
 		

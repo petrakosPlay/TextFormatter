@@ -34,3 +34,6 @@ this condition could be written as
 if (line_requires_padding_with_spaces).
 
 - Also I have a few things (TODOs) written inside the source code as well.
+
+- I put a check to exit the program when a word is longer than the characters per line requested.
+This was a quick fix. I can review it in the future.
