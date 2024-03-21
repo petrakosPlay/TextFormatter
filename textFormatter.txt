@@ -14,7 +14,40 @@ So far the path is pinned down in the code.
 gdb32 --args ./textFormatter 103
 gcc -Wall -g -o textFormatter textFormatter.c  
  gdb32 .\textFormatter
- 
+
+------------------------------------------------------------------------------------------------------------
+A few words about how this tool works. A high level explanation of the algorithm.
+
+In the beginning I just store each word in a buffer.
+Then starting from the first word I start building lines adding words one by one until no more words can fit
+in one line. For each combination of words that fit in a line I calculate the whitespace that has to be filled
+in order to fully justify the line.
+For instance, if I have a CHARS_PER_LINE = 10 and i have the follwing words "My name is Peter"
+then the combination "My name" leaves 3 whitespaces to be filled in order to reach the total of 10 CHARS_PER_LINE.
+the combination "My name is" leaves no whitespace to be filled since it is exactly 10 chars.
+So I calculate the whitespace to be filled for each combination of words.
+Then I change the starting word and do the same thing again for all possible/allowed combinations of words,
+i.e. combinations of words that can fit in one line.
+The results of this calculation are stored in a two dimension table where the row index, let it be I, is the
+starting word and the column index, let it be J is the ending word. So table[I,J] is the whitespace to be filed
+for a line that starts with word wordBuffer[I] and ends with word wordBuffer[J]
+
+After this i start building all possible lines going from the last word of the paragraph to the first word.
+Each time I store the best combination, i.e. the one with the lowest cost i.e. the lowest whitespace.
+For the last line of eaach paragraph there is no cost, since I will not justify it.
+But the words that the last line contains will dictate the possible combinations of words in the previous lines.
+Essesntially as I go towards the first word of the paragraph I am buiding sentences/lines that have the lowest
+aggragate cost, i.e. the cost of the current line plus the best possible cost of all the following lines, i.e.
+the line that starts with the word that is just after the last word of the current line and the lines following
+that line and so on.
+
+The last part is to just print the text and add the needed padding/whitespace wherever needed.
+At the end of the previous step I have a table that tells me where each next line should start, i.e. which is
+the starting word of the next line. So I just have to print all the words in the current line and just add
+some whitespace appropriately.
+
+
+
 ------------------------------------------------------------------------------------------------------------ 
 //TODOs
 
