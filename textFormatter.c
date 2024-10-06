@@ -254,15 +254,15 @@ int main(int argc, char **argv)
     FILE *inputFilePtr, *outputFilePtr;
     inputFilePtr = outputFilePtr = NULL;
 
-//    if ((inputFilePtr = fopen("randomText.txt", "r") ) == NULL )
-    if ((inputFilePtr = fopen("C:\\Users\\petrakos\\Projects\\TextFormatter\\randomText.txt", "r") ) == NULL )
+//    if ((inputFilePtr = fopen("C:\\Users\\petrakos\\Projects\\TextFormatter\\randomText.txt", "r") ) == NULL )
+    if ((inputFilePtr = fopen("randomText.txt", "r") ) == NULL )
     {
         fprintf(stderr, "Error while opening randomText.txt\n");
         exit(EXIT_FAILURE);
     }
 
-//    if ((outputFilePtr = fopen("formattedText.txt", "w") ) == NULL )
-    if ((outputFilePtr = fopen("C:\\Users\\petrakos\\Projects\\TextFormatter\\formattedText.txt", "w") ) == NULL )
+//    if ((outputFilePtr = fopen("C:\\Users\\petrakos\\Projects\\TextFormatter\\formattedText.txt", "w") ) == NULL )
+    if ((outputFilePtr = fopen("formattedText.txt", "w") ) == NULL )
     {
         fprintf(stderr, "Error while opening formattedText.txt\n");
         exit(EXIT_FAILURE);

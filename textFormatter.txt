@@ -13,7 +13,9 @@ So far the path is pinned down in the code.
 
 gdb32 --args ./textFormatter 103
 gcc -Wall -g -o textFormatter textFormatter.c  
- gdb32 .\textFormatter
+gcc textFormatter.c -Wall -g -o textFormatter
+gcc textFormatter.c -Wall -o tf
+gdb32 .\textFormatter
 
 ------------------------------------------------------------------------------------------------------------
 A few words about how this tool works. A high level explanation of the algorithm.
