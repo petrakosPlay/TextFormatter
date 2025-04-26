@@ -16,6 +16,7 @@ gcc -Wall -g -o textFormatter textFormatter.c
 gcc textFormatter.c -Wall -g -o textFormatter
 gcc textFormatter.c -Wall -o tf
 gdb32 .\textFormatter
+gcc C:\Users\petrakos\Projects\TextFormatter\textFormatter.c -o C:\Users\petrakos\bin\textFormatter -Wall
 
 ------------------------------------------------------------------------------------------------------------
 A few words about how this tool works. A high level explanation of the algorithm.
