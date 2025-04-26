@@ -79,11 +79,11 @@ void perrorExit2(char *errorMsg) {
 */
 
 void showHelpText(void) {
-	fprintf(stdout, "\nFormat text so that each line has the same number of characters\n");
-	fprintf(stdout, "Example usage: ./tf -c 100   (for 100 characters per line)\n");
-	fprintf(stdout, "\n  -c			specify the desired number of characters per line\n");
-	fprintf(stdout, "  -h --help		display this help text\n");
-	fprintf(stdout, "  --handleAtSign	handles variables between @ signs in PM statment txt files\n\n");
+	fprintf(stdout, "\nThis tool helps format a text so that each line has the same number of characters\n");
+	fprintf(stdout, "Example usage: ./textformatter.exe -c 100   (for 100 characters per line)\n\n");
+	fprintf(stdout, " -c --charactersPerLine    specify the desired number of characters per line\n");
+	fprintf(stdout, " -h --help                 display this help text\n");
+	fprintf(stdout, " --handleAtSign            handles variables between @ signs in PM statment txt files\n\n");
 }
 
 
@@ -230,10 +230,17 @@ int readNextParagraph(FILE *inputFilePtr, int *wordsCount, int handleAtSignIsEna
 int main(int argc, char **argv)
 {
 	int handleAtSignIsEnabled = 0;
+	
+	if (argc == 1)
+	{
+		showHelpText();
+		exit(EXIT_SUCCESS);
+	}
+	
 	for (i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "-c") == 0)                                         //operations file
-        {
+        if ( (strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--charactersPerLine") == 0) )
+		{
             if(++i == argc)
 			{
 				fprintf(stdout, "You must specify the desired number of characters per line.\n");
