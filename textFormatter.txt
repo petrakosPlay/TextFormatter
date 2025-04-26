@@ -1,3 +1,16 @@
+How to use
+
+1. Get randomText.txt, formattedText.txt and textFormatter.exe in any folder that you want.
+2. Open randomText.txt using a text editor and paste the text to be formatted.
+3. Open a terminal, like cmd of powershell and navigate to the folder where these 3 files are located.
+4. Execute textFormatter.exe. Below there is a usage example.
+5. Open formattedText.txt and copy the formatted text.
+
+Example usage: ./textformatter.exe -c 100   (for 100 characters per line)
+
+------------------------------------------------------------------------------------------------------------
+
+
 - perform checks for maxword length and CHARS_PER_LINE
 - break it down to functions or multiple c source files
 - What happens if i have 2 words and i should put more than one space in between? When would this case occur?
